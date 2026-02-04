@@ -81,3 +81,19 @@ curl -X POST \
 * **Authorization Bypass:** Attackers can create accounts even if public registration is disabled.
 * **Privilege Escalation:** By creating a "Seller" account, the attacker gains access to the seller dashboard, which is a prerequisite for exploiting other vulnerabilities (such as the IDORs mentioned above).
 * **Spam/Fraud:** Attackers can flood the database with fake accounts, degrading database performance and complicating user management.
+
+
+## Remediation Recommendations
+
+### Enforce Authentication on Backend Endpoints
+
+To mitigate the Broken Access Control, every backend PHP file must verify the user's session state before processing any data. Add the following check at the very top of `add_seller.php` and `add_user.php`:
+
+```php
+session_start();
+if (!isset($_SESSION['IS_LOGIN_ADMIN']) || $_SESSION['IS_LOGIN_ADMIN'] !== "YES") {
+    http_response_code(403);
+    die("Unauthorized Access");
+}
+
+```
